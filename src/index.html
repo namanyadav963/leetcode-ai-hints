@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LeetCode AI Hints - Settings</title>
+  <script src="options.js"></script>
+  <link href="./output.css" rel="stylesheet">
+</head>
+<body class="p-6 bg-gray-100">
+  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">LeetCode AI Hints Settings</h1>
+    
+    <div class="mb-4">
+      <label for="apiKey" class="block mb-2">OpenAI API Key:</label>
+      <input 
+        type="password" 
+        id="apiKey" 
+        class="w-full p-2 border rounded"
+        placeholder="Enter your OpenAI API key"
+      >
+      <p class="text-sm text-gray-500 mt-2">
+        Your API key is stored securely and only used for generating hints.
+      </p>
+    </div>
+
+    <div class="mb-4">
+      <label for="hintVerbosity" class="block mb-2">Hint Verbosity:</label>
+      <select 
+        id="hintVerbosity" 
+        class="w-full p-2 border rounded"
+      >
+        <option value="basic">Basic</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="detailed">Detailed</option>
+      </select>
+    </div>
+
+    <button 
+      id="saveSettings" 
+      class="w-full bg-brand-orange text-white p-2 rounded hover:opacity-80"
+    >
+      Save Settings
+    </button>
+  </div>
+</body>
+</html>
