@@ -1,27 +1,31 @@
-import browser from 'webextension-polyfill';
+// Use a different import approach
+const browser = window.browser || window.chrome;
 
 // Extract problem context from LeetCode page
 function extractProblemContext() {
-  return {
-    title: document.querySelector('.mr-2.text-lg.font-medium.text-label-1').textContent,
-    description: document.querySelector('.content__eAC7').textContent,
-    difficulty: document.querySelector('.text-difficulty-medium').textContent
-  };
+  return { 
+    title: document.querySelector('.mr-2.text-lg.font-medium.text-label-1')?.textContent, 
+    description: document.querySelector('.content__eAC7')?.textContent, 
+    difficulty: document.querySelector('.text-difficulty-medium')?.textContent 
+  }; 
 }
 
 // Inject hint button into LeetCode interface
 function injectHintButton() {
   const editorContainer = document.querySelector('.editor-container');
-  
   if (editorContainer && !document.getElementById('ai-hint-button')) {
     const hintButton = document.createElement('button');
     hintButton.id = 'ai-hint-button';
     hintButton.textContent = 'AI Hint';
     hintButton.classList.add(
-      'px-3', 'py-1.5', 'bg-brand-orange', 'text-white', 
-      'rounded', 'hover:opacity-80', 'transition-opacity'
+      'px-3', 
+      'py-1.5', 
+      'bg-brand-orange', 
+      'text-white', 
+      'rounded', 
+      'hover:opacity-80', 
+      'transition-opacity'
     );
-
     hintButton.addEventListener('click', generateHint);
     editorContainer.appendChild(hintButton);
   }
@@ -31,11 +35,17 @@ function injectHintButton() {
 async function generateHint() {
   try {
     const problemContext = extractProblemContext();
-    const response = await browser.runtime.sendMessage({
-      type: 'FETCH_HINT', 
-      problemContext 
+    // Modify this to use Chrome's messaging API if browser is undefined
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'FETCH_HINT', problemContext }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(response);
+        }
+      });
     });
-
+    
     displayHint(response.hint);
   } catch (error) {
     console.error('Hint Generation Error:', error);
@@ -46,18 +56,28 @@ async function generateHint() {
 // Display hint in a non-intrusive panel
 function displayHint(hintText) {
   let hintPanel = document.getElementById('ai-hint-panel');
-  
   if (!hintPanel) {
     hintPanel = document.createElement('div');
     hintPanel.id = 'ai-hint-panel';
     hintPanel.classList.add(
-      'fixed', 'top-1/2', 'right-4', 'transform', '-translate-y-1/2', 
-      'bg-white', 'border', 'rounded-lg', 'p-4', 'shadow-lg', 
-      'w-80', 'max-h-96', 'overflow-y-auto', 'z-50'
+      'fixed', 
+      'top-1/2', 
+      'right-4', 
+      'transform', 
+      '-translate-y-1/2', 
+      'bg-white', 
+      'border', 
+      'rounded-lg', 
+      'p-4', 
+      'shadow-lg', 
+      'w-80', 
+      'max-h-96', 
+      'overflow-y-auto', 
+      'z-50'
     );
     document.body.appendChild(hintPanel);
   }
-
+  
   hintPanel.innerHTML = `
     <div class="flex justify-between items-center mb-2">
       <h3 class="font-bold text-lg">AI Hint</h3>
@@ -65,7 +85,7 @@ function displayHint(hintText) {
     </div>
     <p>${hintText}</p>
   `;
-
+  
   document.getElementById('close-hint-panel')
     .addEventListener('click', () => hintPanel.remove());
 }

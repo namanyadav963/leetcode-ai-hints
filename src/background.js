@@ -47,6 +47,12 @@ async function fetchAIHint(problemContext) {
 browser.runtime.onMessage.addListener(async (message, sender) => {
   if (message.type === 'FETCH_HINT') {
     const hint = await fetchAIHint(message.problemContext);
+    // Send message to options page
+    browser.tabs.query({ url: browser.runtime.getURL('src/index.html') }, (tabs) => {
+      if (tabs.length > 0) {
+        browser.tabs.sendMessage(tabs[0].id, { type: 'DISPLAY_HINT', hint });
+      }
+    });
     return { hint };
   }
 });

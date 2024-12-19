@@ -4,12 +4,18 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        background: 'src/background.js',
+        content: 'src/content.js',
+        background: 'src/background.js'
       },
       output: {
-        entryFileNames: 'background.js',
-      },
-    },
-    outDir: 'dist',
+        format: 'es',
+        entryFileNames: '[name].js'
+      }
+    }
   },
+  resolve: {
+    alias: {
+      'webextension-polyfill': 'webextension-polyfill/dist/browser-polyfill.js'
+    }
+  }
 });
